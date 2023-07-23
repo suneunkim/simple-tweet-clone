@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now())
+  likes     Like[]
+  tweets    Tweet[]
+}
+
+model Tweet {
+  id        Int      @id @default(autoincrement())
+  text      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  likes     Like[]
+
+  @@index([userId])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  tweet     Tweet    @relation(fields: [tweetId], references: [id])
+  tweetId   Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@index([tweetId])
+  @@index([userId])
+}
+
+// pscale auth login -> pscale database list -> pscale connect <database name>

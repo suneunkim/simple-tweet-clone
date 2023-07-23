@@ -1,118 +1,139 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import useSWR from "swr";
+import { useForm } from "react-hook-form";
+import { Tweet, User } from "@prisma/client";
+import Link from "next/link";
 
-const inter = Inter({ subsets: ['latin'] })
-
-export default function Home() {
-  return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+interface ITweetWithUser extends Tweet {
+  user: User;
 }
+
+interface ITweetData {
+  ok: boolean;
+  allTweet: ITweetWithUser[];
+}
+
+export default () => {
+  const { data: userData, error } = useSWR("/api/users/home");
+  const router = useRouter();
+  const { data: tweets, mutate } = useSWR<ITweetData>("/api/tweets");
+  const { register, handleSubmit, reset } = useForm();
+  const [loading, setLoading] = useState(false);
+
+  const onValid = async (data: any) => {
+    if (!loading) {
+      setLoading(true);
+
+      try {
+        const request = await fetch("/api/tweets", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (request.status === 201) {
+          mutate();
+          reset();
+          return console.log("트윗 작성 성공");
+          //트윗 작성 성공시
+        } else {
+          console.log("안됨");
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    reset();
+  };
+
+  useEffect(() => {
+    if (error) {
+      router.replace("/create");
+      console.log(error);
+    }
+  }, [router, error]);
+  if (!userData) {
+    return <div></div>;
+  }
+
+  const onLogout = async () => {
+    const request = await fetch("/api/users/logout", {
+      method: "POST",
+    });
+
+    if (request.status === 200) {
+      router.reload();
+    } else {
+      console.log("로그아웃 실패");
+    }
+  };
+
+  return (
+    <div className="mx-auto flex max-w-lg flex-col justify-center space-y-10 px-2 py-20">
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold">모든 트윗을 확인하세요</h1>
+        <button
+          onClick={onLogout}
+          className="w-1/6 rounded-2xl bg-sky-400 font-semibold text-white  text-sm
+    shadow-sm hover:bg-sky-300 transition"
+        >
+          로그아웃
+        </button>
+      </div>
+      <div className="flex w-full items-center justify-between">
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          className="
+           hover:scale-110
+           transition
+          r-k200y r-1cvl2hr r-4qtqp9 r-yyyyoo r-5sfk15 r-dnmrzs r-kzbkwu r-bnwqim r-1plcrui r-lrvibr h-10 w-10 self-start fill-sky-500"
+        >
+          <g>
+            <path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path>
+          </g>
+        </svg>
+        <div className=" text-sm">{userData?.name}로 로그인 되었습니다.</div>
+      </div>
+      {tweets ? (
+        <div className="w-full  border-t-2 divide-y-2 border-b-2">
+          {tweets?.allTweet.map((t) => (
+            <div className="py-6" key={t.id}>
+              <h4 className="font-bold">
+                <Link className=" hover:text-gray-500" href={`/${t.user.name}/tweets`}>
+                  {t.user.name}
+                </Link>
+              </h4>
+              <Link className=" hover:text-gray-400" href={`/tweet/${t.id}`}>
+                <p>{t.text}</p>
+              </Link>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div>아직 작성된 메세지가 없습니다.</div>
+      )}
+
+      <form onClick={handleSubmit(onValid)} className="flex w-full gap-2">
+        <textarea
+          {...register("text", { required: true })}
+          placeholder="무슨 일이 일어나고 있나요? 지금 공유하세요!"
+          className="w-3/4 p-3 border border-gray-300 rounded-2xl shadow-sm placeholder-gray-400 
+    focus:outline-none focus:ring-sky-500 focus:border-sky-500"
+        ></textarea>
+        <button
+          type="submit"
+          className="w-1/4 rounded-2xl bg-sky-500 px-3 py-2 font-semibold text-white 
+    shadow-sm hover:bg-sky-400 transition"
+        >
+          트윗
+        </button>
+      </form>
+    </div>
+  );
+};
