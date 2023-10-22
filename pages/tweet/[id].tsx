@@ -1,26 +1,28 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import useMutation from "@/libs/client/useMutation";
+import Loader from "@/components/Loader";
 
 export default () => {
   const router = useRouter();
   const { id } = router.query;
-  const { data, mutate, error } = useSWR(`/api/users/tweet/${id}`);
+  const { data, mutate, error } = useSWR(`/api/users/tweet/${id}`); // tweet의 id
   const [isLiked, setIsLiked] = useState(data?.userTweet.isLiked);
+  const [like, { loading }] = useMutation(`/api/tweets/${router?.query.id}/like`);
 
-  console.log(data);
+  if (!data) {
+    return <Loader />;
+  }
 
   const handleLike = async () => {
-    try {
-      setIsLiked(true);
-      const request = await fetch(`/api/tweet/${data?.userTweet.user.id}/like`, {
-        method: "POST",
-      });
+    if (loading) return;
 
-      if (request.status === 200) {
-        mutate();
-      }
+    try {
+      like({});
+      setIsLiked(() => !isLiked);
+      // Like의 상태 불러와서 업데이트 해줘야 정확할 것.
     } catch (error) {
       console.log("handleLike", error);
     }
@@ -43,23 +45,24 @@ export default () => {
             </g>
           </svg>
         </Link>
-        <h1 className="text-4xl font-bold">트윗 살펴보기</h1>
+        <h1 className="text-3xl font-bold">트윗 살펴보기</h1>
       </div>
       <div>
         <Link href={`/${data?.userTweet.user.name}/tweets`}>
-          <h3 className="text-2xl font-bold">{data?.userTweet.user.name}</h3>
+          <h3 className="text-2xl font-bold text-gray-700 ">{data?.userTweet.user.name}</h3>
         </Link>
       </div>
+      {/* 트윗 상세 */}
       <div className="w-full  border-t-2 divide-y-2 border-b-2">
         <div className="py-6">
           <h4 className="font-bold"></h4>
-          <p>{data?.userTweet.text}</p>
+          <p className="text-gray-700">{data?.userTweet.text}</p>
           <div className="mt-5 flex justify-between">
-            <p>작성일: {data?.userTweet.createdAt}</p>
+            <p className="text-sm text-gray-600">작성일: {new Date(data?.userTweet.createdAt).toLocaleString()}</p>
             <button onClick={handleLike} className="mr-2">
               {isLiked ? (
                 <svg
-                  className="w-6 text-red-500"
+                  className="w-4 text-red-500"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg"
@@ -73,13 +76,13 @@ export default () => {
                 </svg>
               ) : (
                 <svg
+                  className="w-4 hover:text-red-500 transition"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={2}
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
-                  className=" w-6 hover:text-red-500 transition"
                 >
                   <path
                     strokeLinecap="round"

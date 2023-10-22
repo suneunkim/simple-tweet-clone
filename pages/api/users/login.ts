@@ -1,6 +1,7 @@
-import { withApiSession } from "@/libs/withSession";
-import db from "@/libs/db";
+import { withApiSession } from "@/libs/server/withSession";
+import db from "@/libs/server/prismaClinet";
 import { NextApiRequest, NextApiResponse } from "next";
+import withHandler from "@/libs/server/withHandler";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -23,5 +24,3 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default withApiSession(handler);
-//404 유저 없음
-//유저 db에서 확인되면 세션에 저장

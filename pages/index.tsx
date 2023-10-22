@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import useSWR from "swr";
 import { useForm } from "react-hook-form";
 import { Tweet, User } from "@prisma/client";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
+import Loader from "@/components/Loader";
 
 interface ITweetWithUser extends Tweet {
   user: User;
@@ -15,8 +17,8 @@ interface ITweetData {
 }
 
 export default () => {
-  const { data: userData, error } = useSWR("/api/users/home");
   const router = useRouter();
+  const { data: userData, error } = useSWR("/api/users/home");
   const { data: tweets, mutate } = useSWR<ITweetData>("/api/tweets");
   const { register, handleSubmit, reset } = useForm();
   const [loading, setLoading] = useState(false);
@@ -37,13 +39,9 @@ export default () => {
         if (request.status === 201) {
           mutate();
           reset();
-          return console.log("트윗 작성 성공");
-          //트윗 작성 성공시
-        } else {
-          console.log("안됨");
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -57,8 +55,9 @@ export default () => {
       console.log(error);
     }
   }, [router, error]);
-  if (!userData) {
-    return <div></div>;
+
+  if (!tweets) {
+    return <Loader />;
   }
 
   const onLogout = async () => {
@@ -98,17 +97,20 @@ export default () => {
             <path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path>
           </g>
         </svg>
-        <div className=" text-sm">{userData?.name}로 로그인 되었습니다.</div>
+        <div className="text-sm">{`${userData ? userData?.name : "당신은...! "}로 로그인 되었습니다.`}</div>
       </div>
-      {tweets ? (
+      {tweets?.allTweet?.length! > 0 ? (
         <div className="w-full  border-t-2 divide-y-2 border-b-2">
           {tweets?.allTweet.map((t) => (
             <div className="py-6" key={t.id}>
-              <h4 className="font-bold">
-                <Link className=" hover:text-gray-500" href={`/${t.user.name}/tweets`}>
-                  {t.user.name}
-                </Link>
-              </h4>
+              <div className="flex justify-between">
+                <h4 className="font-bold">
+                  <Link className=" hover:text-gray-500" href={`/${t.user.name}/tweets`}>
+                    {t.user.name}
+                  </Link>
+                </h4>
+                <p className="test-xs">{formatDistanceToNow(new Date(t?.createdAt), { addSuffix: true })}</p>
+              </div>
               <Link className=" hover:text-gray-400" href={`/tweet/${t.id}`}>
                 <p>{t.text}</p>
               </Link>
@@ -116,9 +118,27 @@ export default () => {
           ))}
         </div>
       ) : (
-        <div>아직 작성된 메세지가 없습니다.</div>
+        <div className="flex flex-col justify-center items-center w-full h-80 space-y-2">
+          <svg
+            className="w-32 h-32"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p className="text-md font-semibold text-gray-700">아직 작성된 메세지가 없습니다.</p>
+          <p className="text-lg font-bold text-gray-600">지금 트윗을 작성해보세요!</p>
+        </div>
       )}
-
+      {/* 트윗 입력 */}
       <form onClick={handleSubmit(onValid)} className="flex w-full gap-2">
         <textarea
           {...register("text", { required: true })}

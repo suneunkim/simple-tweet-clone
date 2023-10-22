@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import useMutation from "@/libs/client/useMutation";
 
 export default () => {
   const { register, handleSubmit } = useForm();

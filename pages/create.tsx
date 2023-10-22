@@ -24,11 +24,9 @@ export default () => {
       });
       if (request.status === 200) {
         alert("계정이 이미 존재합니다. 로그인을 해주세요.");
-        console.log("이미 생성됨");
       }
       if (request.status === 201) {
         alert("계정이 생성되었습니다.");
-        console.log("ok 생성됨");
       }
       if (request.status !== 405) {
         router.push("/login");

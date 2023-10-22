@@ -1,5 +1,5 @@
-import { withApiSession } from "@/libs/withSession";
-import db from "@/libs/db";
+import { withApiSession } from "@/libs/server/withSession";
+import db from "@/libs/server/prismaClinet";
 import { NextApiRequest, NextApiResponse } from "next";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

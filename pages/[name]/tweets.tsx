@@ -1,13 +1,16 @@
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import Link from "next/link";
+import Loader from "@/components/Loader";
 
 export default () => {
   const router = useRouter();
   const { name } = router.query;
   const { data, mutate } = useSWR(`/api/users/${name}/tweets`);
 
-  console.log(data);
+  if (!data) {
+    return <Loader />;
+  }
 
   return (
     <div className="mx-auto flex max-w-lg flex-col justify-center space-y-5 px-2 py-20">
@@ -29,7 +32,9 @@ export default () => {
       </div>
       <div>
         <h3 className="text-2xl font-bold">{data?.name}</h3>
-        <p>가입일: {data?.userTweets[0].user.createdAt}</p>
+        <p className="mt-4 text-sm text-gray-600">
+          가입일: {new Date(data?.userTweets[0].user.createdAt).toLocaleString()}
+        </p>
       </div>
       <div className="w-full  border-t-2 divide-y-2 border-b-2">
         {data?.userTweets.map((t: any) => (
@@ -37,7 +42,7 @@ export default () => {
             <h4 className="font-bold">{t.user.name}</h4>
             <p>{t.text}</p>
             <div className="mt-5 flex justify-between">
-              <p>작성일: {t.createdAt}</p>
+              <p className="text-sm text-gray-600">작성일: {new Date(t.createdAt).toLocaleString()}</p>
             </div>
           </div>
         ))}

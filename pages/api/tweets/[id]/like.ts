@@ -1,22 +1,55 @@
-import db from "@/libs/db";
-import { withApiSession } from "@/libs/withSession";
+import { withApiSession } from "@/libs/server/withSession";
+import db from "@/libs/server/prismaClinet";
 import { NextApiRequest, NextApiResponse } from "next";
+import withHandler from "@/libs/server/withHandler";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { tweetId } = req.query;
-  if (tweetId) {
-    const tweet = await db.tweet.findUnique({
+  const {
+    query: { id },
+    session: { user },
+  } = req;
+
+  const alreadyExists = await db.like.findFirst({
+    where: {
+      userId: user?.id,
+      id: Number(id),
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (alreadyExists) {
+    await db.like.delete({
       where: {
-        id: +tweetId,
+        id: alreadyExists.id,
       },
     });
-
-    if (!tweet) {
-      return res.status(404).json({ message: "트윗을 찾을 수 없습니다." });
-    }
-
-    return res.status(200).json({ message: "좋아요 처리가 완료되었습니다." });
+  } else {
+    await db.like.create({
+      data: {
+        user: {
+          connect: {
+            id: user?.id,
+          },
+        },
+        tweet: {
+          connect: {
+            id: Number(id),
+          },
+        },
+      },
+    });
   }
+
+  res.json({
+    ok: true,
+  });
 }
 
-export default withApiSession(handler);
+export default withApiSession(
+  withHandler({
+    methods: ["POST"],
+    handler,
+  })
+);

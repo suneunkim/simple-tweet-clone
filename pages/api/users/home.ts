@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { withApiSession } from "@/libs/withSession";
-import db from "@/libs/db";
+import { withApiSession } from "@/libs/server/withSession";
+import db from "@/libs/server/prismaClinet";
 
 interface ResponseType {
   id: number;
@@ -16,6 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ResponseType>) 
   if (!user?.id) {
     return res.status(401).end();
   }
+  // 로그인한 유저 정보
   const dbUser = await db.user.findUnique({
     where: {
       id: user.id,

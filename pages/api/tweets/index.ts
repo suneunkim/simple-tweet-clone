@@ -1,5 +1,5 @@
-import { withApiSession } from "@/libs/withSession";
-import db from "@/libs/db";
+import { withApiSession } from "@/libs/server/withSession";
+import db from "@/libs/server/prismaClinet";
 import { NextApiRequest, NextApiResponse } from "next";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -25,7 +25,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     });
     return res.status(201).json(createdTweet);
-  } else if ((req.method = "GET")) {
+  }
+
+  if ((req.method = "GET")) {
     const allTweet = await db.tweet.findMany({
       include: {
         user: true,
